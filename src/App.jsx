@@ -223,6 +223,7 @@ export default function App() {
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [totalMiss, setTotalMiss] = useState(0);
   const [showEffect, setShowEffect] = useState(null);
+  const [showReading, setShowReading] = useState(false);
   
   // 迫ってくる演出用
   const [scale, setScale] = useState(1);
@@ -245,6 +246,7 @@ export default function App() {
     setScore(0);
     setCombo(0);
     setMaxCombo(0);
+    setShowReading(false);
     setLives(3);
     setTotalCorrect(0);
     setTotalMiss(0);
@@ -272,6 +274,7 @@ export default function App() {
     setInput('');
     setScale(1);
     setElapsedTime(0);
+    setShowReading(false);
     
     // 成功時は時間を短縮
     if (success) {
@@ -390,6 +393,7 @@ export default function App() {
       setCombo(0);
       setTotalMiss(prev => prev + 1);
       setShowEffect('miss');
+      setShowReading(true);
       setTimeout(() => setShowEffect(null), 200);
     }
   };
@@ -542,10 +546,12 @@ export default function App() {
           {currentQuestion?.kanji}
         </div>
         
-        {/* 読み仮名（固定位置） */}
-        <div className="reading-display">
-          <span className="reading-text">{currentQuestion?.reading}</span>
-        </div>
+        {/* 読み仮名（ミス後に表示） */}
+        {showReading && (
+          <div className="reading-display">
+            <span className="reading-text">{currentQuestion?.reading}</span>
+          </div>
+        )}
       </div>
 
       {/* 入力エリア */}
@@ -556,22 +562,24 @@ export default function App() {
           value={input}
           onChange={handleInput}
           className="typing-input"
-          placeholder={currentQuestion?.romaji}
+          placeholder={showReading ? currentQuestion?.romaji : ''}
           autoComplete="off"
           autoCapitalize="off"
           spellCheck="false"
         />
         
-        <div className="romaji-progress">
-          {currentQuestion?.romaji.split('').map((char, i) => (
-            <span
-              key={i}
-              className={i < input.length ? 'typed' : 'pending'}
-            >
-              {char}
-            </span>
-          ))}
-        </div>
+        {showReading && (
+          <div className="romaji-progress">
+            {currentQuestion?.romaji.split('').map((char, i) => (
+              <span
+                key={i}
+                className={i < input.length ? 'typed' : 'pending'}
+              >
+                {char}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* フッター */}
